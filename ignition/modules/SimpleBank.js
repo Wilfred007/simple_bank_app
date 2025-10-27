@@ -4,7 +4,7 @@
 
 const { buildModule } = require("@nomicfoundation/hardhat-ignition/modules");
 
-const SimpleBankModule = buildModule("SimpleBankModule", (m) => {
+const SimpleBankModule = buildModule("SimpleBankModulev2", (m) => {
   console.log("🏦 Deploying SimpleBank contract...");
   
   // Deploy the SimpleBank contract (no constructor parameters needed)

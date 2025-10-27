@@ -4,7 +4,7 @@ require("dotenv").config();
 
 console.log("🔧 Loading Hardhat configuration...");
 
-const BASE_SEPOLIA_RPC_URL = process.env.BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org";
+const BASE_MAINNET_RPC_URL = process.env.BASE_MAINNET_RPC_URL || "https://mainnet.base.org";
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const BASESCAN_API_KEY = process.env.BASESCAN_API_KEY;
 
@@ -18,7 +18,7 @@ if (!PRIVATE_KEY) {
   console.log("✅ Private key loaded");
 }
 
-console.log("🌐 RPC URL:", BASE_SEPOLIA_RPC_URL);
+console.log("🌐 RPC URL:", BASE_MAINNET_RPC_URL);
 
 /** @type import('hardhat/config').HardhatUserConfig */
 const config = {
@@ -51,51 +51,61 @@ const config = {
       chainId: 31337,
     },
     
-    // Base Sepolia Testnet
-    baseSepolia: {
-      url: BASE_SEPOLIA_RPC_URL,
-      chainId: 84532,
-      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
-      gas: "auto",
-      gasPrice: "auto",
-      gasMultiplier: 1.2,
-      timeout: 60000,
-      httpHeaders: {},
-    },
+    // Base Mainnet
+// baseMainnet: {
+//   url: BASE_MAINNET_RPC_URL,
+//   chainId: 8453,
+//   accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+//   gas: "auto",
+//   gasPrice: "auto", 
+//   gasMultiplier: 1.2,
+//   timeout: 60000,
+// },
     
-    // Alternative network name (for compatibility)
-    "base-sepolia": {
-      url: BASE_SEPOLIA_RPC_URL,
-      chainId: 84532,
-      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
-      gas: "auto", 
-      gasPrice: "auto",
-      gasMultiplier: 1.2,
-      timeout: 60000,
-    },
+    // // Alternative network name (for compatibility)
+    // "base-sepolia": {
+    //   url: BASE_SEPOLIA_RPC_URL,
+    //   chainId: 84532,
+    //   accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+    //   gas: "auto", 
+    //   gasPrice: "auto",
+    //   gasMultiplier: 1.2,
+    //   timeout: 60000,
+    // },
+
+    // Base Mainnet
+baseMainnet: {
+  url: BASE_MAINNET_RPC_URL,
+  chainId: 8453,
+  accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+  gas: "auto",
+  gasPrice: "auto", 
+  gasMultiplier: 1.2,
+  timeout: 60000,
+},
   },
   
   // Contract verification
   etherscan: {
     apiKey: {
       baseSepolia: BASESCAN_API_KEY || "dummy",
-      "base-sepolia": BASESCAN_API_KEY || "dummy",
+      baseMainnet: BASESCAN_API_KEY || "dummy",
     },
     customChains: [
       {
-        network: "baseSepolia",
-        chainId: 84532,
+        network: "baseMainnet",
+        chainId: 8453,
         urls: {
           apiURL: "https://api-sepolia.basescan.org/api",
           browserURL: "https://sepolia.basescan.org"
         }
       },
       {
-        network: "base-sepolia",
-        chainId: 84532,
+        network: "baseMainnet",
+        chainId: 8453,
         urls: {
-          apiURL: "https://api-sepolia.basescan.org/api",
-          browserURL: "https://sepolia.basescan.org"
+          apiURL: "https://mainnet.base.org",
+          browserURL: "https://basescan.org" 
         }
       }
     ]
@@ -131,3 +141,63 @@ console.log("📋 Available networks:", Object.keys(config.networks || {}));
 
 // Export the configuration
 module.exports = config;
+
+
+// import type { HardhatUserConfig } from "hardhat/config";
+// import hardhatVerify from "@nomicfoundation/hardhat-verify";
+
+// import hardhatToolboxViemPlugin from "@nomicfoundation/hardhat-toolbox-viem";
+// import { configVariable } from "hardhat/config";
+
+// const config: HardhatUserConfig = {
+//  plugins: [hardhatToolboxViemPlugin, hardhatVerify],
+//  solidity: {
+//   profiles: {
+//    default: {
+//     version: "0.8.28",
+//    },
+//    production: {
+//     version: "0.8.28",
+//     settings: {
+//      optimizer: {
+//       enabled: true,
+//       runs: 200,
+//      },
+//     },
+//    },
+//   },
+//  },
+//  verify: {
+//   etherscan: {
+//    apiKey: configVariable("ETHERSCAN_API_KEY"),
+//   },
+//  },
+//  networks: {
+//   hardhatMainnet: {
+//    type: "edr-simulated",
+//    chainType: "l1",
+//   },
+//   hardhatOp: {
+//    type: "edr-simulated",
+//    chainType: "op",
+//   },
+//   sepolia: {
+//    type: "http",
+//    chainType: "l1",
+//    url: configVariable("SEPOLIA_RPC_URL"),
+//    accounts: [configVariable("SEPOLIA_PRIVATE_KEY")],
+//   },
+//   baseSepolia: {
+//    type: "http",
+//    url: "https://sepolia.base.org",
+//    accounts: [configVariable("BASE_SEPOLIA_PRIVATE_KEY")],
+//   },
+//   baseMainnet: {
+//    type: "http",
+//    url: "https://mainnet.base.org",
+//    accounts: [configVariable("BASE_SEPOLIA_PRIVATE_KEY")],
+//   },
+//  },
+// };
+
+// export default config;
