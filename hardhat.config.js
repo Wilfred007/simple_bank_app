@@ -13,9 +13,17 @@ if (!PRIVATE_KEY) {
   console.warn("⚠️  PRIVATE_KEY not found in environment variables");
   console.warn("📝 Create a .env file with your private key:");
   console.warn("   PRIVATE_KEY=your_wallet_private_key_here");
-  console.warn("   BASE_SEPOLIA_RPC_URL=https://sepolia.base.org");
+  console.warn("   BASE_MAINNET_RPC_URL=https://mainnet.base.org");
+  console.warn("   BASESCAN_API_KEY=your_basescan_api_key_here");
 } else {
   console.log("✅ Private key loaded");
+}
+
+if (!BASESCAN_API_KEY) {
+  console.warn("⚠️  BASESCAN_API_KEY not found - contract verification will fail");
+  console.warn("📝 Get your API key from https://basescan.org/myapikey");
+} else {
+  console.log("✅ Basescan API key loaded");
 }
 
 console.log("🌐 RPC URL:", BASE_MAINNET_RPC_URL);
@@ -23,13 +31,13 @@ console.log("🌐 RPC URL:", BASE_MAINNET_RPC_URL);
 /** @type import('hardhat/config').HardhatUserConfig */
 const config = {
   solidity: {
-    version: "0.8.28", // Updated to match OpenZeppelin v5.0.0
+    version: "0.8.28",
     settings: {
       optimizer: {
         enabled: true,
         runs: 200,
       },
-      viaIR: true, // Enable for better optimization
+      viaIR: true,
     },
   },
   
@@ -52,70 +60,42 @@ const config = {
     },
     
     // Base Mainnet
-// baseMainnet: {
-//   url: BASE_MAINNET_RPC_URL,
-//   chainId: 8453,
-//   accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
-//   gas: "auto",
-//   gasPrice: "auto", 
-//   gasMultiplier: 1.2,
-//   timeout: 60000,
-// },
-    
-    // // Alternative network name (for compatibility)
-    // "base-sepolia": {
-    //   url: BASE_SEPOLIA_RPC_URL,
-    //   chainId: 84532,
-    //   accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
-    //   gas: "auto", 
-    //   gasPrice: "auto",
-    //   gasMultiplier: 1.2,
-    //   timeout: 60000,
-    // },
-
-    // Base Mainnet
-baseMainnet: {
-  url: BASE_MAINNET_RPC_URL,
-  chainId: 8453,
-  accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
-  gas: "auto",
-  gasPrice: "auto", 
-  gasMultiplier: 1.2,
-  timeout: 60000,
-},
+    baseMainnet: {
+      url: BASE_MAINNET_RPC_URL,
+      chainId: 8453,
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+      gas: "auto",
+      gasPrice: "auto", 
+      gasMultiplier: 1.2,
+      timeout: 60000,
+    },
   },
   
-  // Contract verification
+  // Contract verification - Etherscan API V2 format
   etherscan: {
-    apiKey: {
-      baseSepolia: BASESCAN_API_KEY || "dummy",
-      baseMainnet: BASESCAN_API_KEY || "dummy",
-    },
+    apiKey: BASESCAN_API_KEY || "",
     customChains: [
       {
         network: "baseMainnet",
         chainId: 8453,
         urls: {
-          apiURL: "https://api-sepolia.basescan.org/api",
-          browserURL: "https://sepolia.basescan.org"
-        }
-      },
-      {
-        network: "baseMainnet",
-        chainId: 8453,
-        urls: {
-          apiURL: "https://mainnet.base.org",
-          browserURL: "https://basescan.org" 
+          apiURL: "https://api.basescan.org/api",
+          browserURL: "https://basescan.org"
         }
       }
     ]
+  },
+  
+  // Sourcify verification (optional)
+  sourcify: {
+    enabled: false
   },
   
   // Gas reporting
   gasReporter: {
     enabled: process.env.REPORT_GAS === "true",
     currency: "USD",
-    gasPrice: 1, // In gwei
+    gasPrice: 1,
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
   },
   
@@ -129,7 +109,7 @@ baseMainnet: {
   
   // Mocha testing configuration
   mocha: {
-    timeout: 60000, // 60 seconds
+    timeout: 60000,
   },
   
   // Default network for Hardhat tasks
@@ -139,65 +119,4 @@ baseMainnet: {
 console.log("✅ Hardhat configuration loaded successfully");
 console.log("📋 Available networks:", Object.keys(config.networks || {}));
 
-// Export the configuration
 module.exports = config;
-
-
-// import type { HardhatUserConfig } from "hardhat/config";
-// import hardhatVerify from "@nomicfoundation/hardhat-verify";
-
-// import hardhatToolboxViemPlugin from "@nomicfoundation/hardhat-toolbox-viem";
-// import { configVariable } from "hardhat/config";
-
-// const config: HardhatUserConfig = {
-//  plugins: [hardhatToolboxViemPlugin, hardhatVerify],
-//  solidity: {
-//   profiles: {
-//    default: {
-//     version: "0.8.28",
-//    },
-//    production: {
-//     version: "0.8.28",
-//     settings: {
-//      optimizer: {
-//       enabled: true,
-//       runs: 200,
-//      },
-//     },
-//    },
-//   },
-//  },
-//  verify: {
-//   etherscan: {
-//    apiKey: configVariable("ETHERSCAN_API_KEY"),
-//   },
-//  },
-//  networks: {
-//   hardhatMainnet: {
-//    type: "edr-simulated",
-//    chainType: "l1",
-//   },
-//   hardhatOp: {
-//    type: "edr-simulated",
-//    chainType: "op",
-//   },
-//   sepolia: {
-//    type: "http",
-//    chainType: "l1",
-//    url: configVariable("SEPOLIA_RPC_URL"),
-//    accounts: [configVariable("SEPOLIA_PRIVATE_KEY")],
-//   },
-//   baseSepolia: {
-//    type: "http",
-//    url: "https://sepolia.base.org",
-//    accounts: [configVariable("BASE_SEPOLIA_PRIVATE_KEY")],
-//   },
-//   baseMainnet: {
-//    type: "http",
-//    url: "https://mainnet.base.org",
-//    accounts: [configVariable("BASE_SEPOLIA_PRIVATE_KEY")],
-//   },
-//  },
-// };
-
-// export default config;
